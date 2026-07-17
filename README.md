@@ -27,6 +27,8 @@ The skill includes a VS Code prompt template at:
 `npx skills add` installs skills in the agent skills directory; it does not
 automatically copy prompt files into your project `.github/prompts` folder.
 
+### Prompt installation
+
 Use the helper script from the installed skill to copy prompt templates into a
 target project:
 
