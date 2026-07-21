@@ -68,6 +68,24 @@ Every page/route that previously imported `getPageProps` from
 now import it from this local `lazy/server.ts` wrapper instead, so
 `registerLazyProps()` always runs before props are resolved.
 
+Re-export this wrapper from the project's own Mixer UI package's `server`
+subpath (e.g. `@givi/ui/server` — check the actual `name` in
+`src/mixer/packages/ui/package.json` and its `exports`/`server.ts` barrel) so
+every `pages/**/*.tsx` template has a single, project-scoped import to
+update:
+
+```tsx
+import { getPageProps } from '@givi/ui/server';
+```
+
+This is a mechanical import-path swap only — do not change how
+`getPageProps` is called or destructured on the page. Sweep **every** page
+file under Mixer's `pages/[market]/[locale]/**/[id].tsx` (and any other route
+that renders a page template) and update the import; a leftover import from
+`@websolutespa/bom-mixer-models/server` or `@givi/models/server` means that
+page's lazy blocks won't have `registerLazyProps()` called first and will
+silently render without their server props.
+
 ## Rules
 
 - **Do not change any logic** — copy the `withLazyProps` callback body

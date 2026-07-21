@@ -82,6 +82,7 @@ How to use:
 - [ ] `[skip]` not applicable to this project, OR:
 - [ ] Progress tracked in `refactor-lazy.md` (or equivalent) — resume from there
 - [ ] `lazy/server.ts` registry created/updated with all migrated blocks
+- [ ] Every `pages/**/*.tsx` template's `getPageProps` import swapped to the local UI package's `/server` wrapper (e.g. `@givi/ui/server`) instead of `@websolutespa/bom-mixer-models/server` or `@givi/models/server`
 - [ ] Verification: no `.tsx` client file under `lazy/` still imports `withLazyProps`; build succeeds without server code in client bundles
 
 ## Phase 7 — Middleware → proxy (references/proxy-middleware.md)

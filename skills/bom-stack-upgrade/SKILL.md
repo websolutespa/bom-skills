@@ -75,7 +75,7 @@ in full before editing files for that phase.
 | 3 | Payload config migration | [references/payload-config.md](./references/payload-config.md) | `src/bowl/*/payload.config.ts` (or equivalent Bowl app) |
 | 4 | App Router migration | [references/app-router.md](./references/app-router.md) | Bowl's Next.js app scaffold (`src/app/(payload)`, `src/app/(frontend)`) |
 | 5 | Payload custom components | [references/custom-components.md](./references/custom-components.md) | Bowl admin custom Field/UI components |
-| 6 | Mixer lazy block split | [references/lazy-blocks.md](./references/lazy-blocks.md) | Mixer UI package `lazy/` blocks using `withLazyProps` |
+| 6 | Mixer lazy block split | [references/lazy-blocks.md](./references/lazy-blocks.md) | Mixer UI package `lazy/` blocks using `withLazyProps`, plus every page template's `getPageProps` import |
 | 7 | Middleware → proxy | [references/proxy-middleware.md](./references/proxy-middleware.md) | Mixer web `middleware.ts` |
 | 8 | TypeScript fixes | [references/typescript-fixes.md](./references/typescript-fixes.md) | repo-wide compile error cleanup, applied last |
 

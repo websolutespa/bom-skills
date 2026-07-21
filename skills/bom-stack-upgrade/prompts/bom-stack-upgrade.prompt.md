@@ -32,7 +32,11 @@ next.
    (dependencies → tooling → payload config → app router → custom components
    → lazy blocks → proxy/middleware → TypeScript fixes), verifying after each
    one before moving to the next. Skip phases that don't apply to this repo
-   and record why in the checklist rather than silently ignoring them.
+   and record why in the checklist rather than silently ignoring them. The
+   lazy blocks phase also includes sweeping every Mixer `pages/**/*.tsx`
+   template so its `getPageProps` import points at the local UI package's
+   `/server` wrapper (e.g. `@givi/ui/server`) instead of importing directly
+   from `@websolutespa/bom-mixer-models/server` or `@givi/models/server`.
 4. **Verify, don't assume.** After each phase, run the verification commands
    specified in that phase's reference file (install/typecheck/lint/build).
    Fix issues surfaced by that phase before moving on.
