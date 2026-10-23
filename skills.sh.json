@@ -6,7 +6,8 @@
       "title": "BOM Stack",
       "description": "Skills for migrating and maintaining Websolute BOM-stack projects.",
       "skills": [
-        "bom-stack-upgrade"
+        "bom-stack-upgrade",
+        "bom-stack-upgrade-3-1"
       ]
     }
   ]

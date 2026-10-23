@@ -37,7 +37,9 @@ of three outcomes:
 
 1. **Not a BOM-stack project** → stop, explain why, do nothing else.
 2. **Already upgraded** (Payload/`@websolutespa/bom-core` already major `3`)
-   → stop, tell the user it's already on v3, do nothing else.
+   → stop, tell the user it's already on v3, do nothing else. If it is on
+   3.0.x (`@websolutespa/*` below 3.1, Payload below 3.91), suggest the
+   `bom-stack-upgrade-3-1` skill to move it to the 3.1 release.
 3. **Eligible** → continue to step 1. If a todo checklist already exists from
    a previous run, resume it instead of recreating it (step 1).
 

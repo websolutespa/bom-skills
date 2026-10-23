@@ -56,7 +56,9 @@ investigation" and lean cautious).
   everywhere it appears → the project is already on bom-stack 3.x. **Stop**
   and tell the user so. Do not modify anything. (If the user wants to
   re-verify a partially-completed upgrade, that's a different task — point
-  them at the checklist file instead, see below.)
+  them at the checklist file instead, see below.) If the project is on
+  3.0.x, the `bom-stack-upgrade-3-1` skill upgrades it to the 3.1 release
+  (Payload 3.91, Next 16.4); suggest that instead.
 - **Partially upgraded / resuming**: if `bom-upgrade/UPGRADE_TODO.md` already
   exists in the repo, this is a resume, not a fresh guardrail decision — skip
   straight to reading the checklist and continuing from the first unchecked
