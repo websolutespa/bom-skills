@@ -42,6 +42,7 @@ How to use:
 - [ ] `eslint-disable` directives renamed to `@stylistic/*`
 - [ ] rimraf scripts use `--glob`, no `!` negations
 - [ ] `turbo.json` globalEnv: + `AZURE_STORAGE_CONTAINER_ACCESS`, `BOM_DB`, `BOM_TEST_DB`, − `TS_JEST`
+- [ ] `turbo.json` `dev` task: `dependsOn: ["^dev"]` removed (turbo 2.11 otherwise never starts the app's dev server)
 - [ ] `.gitignore`: `AGENTS.md` in both apps, `next-env.d.ts` untracked
 - [ ] `.esproj`: Vitest
 - [ ] Verification: `turbo run types` passes; `turbo run lint` reports 0 errors (record the warning count: ____)

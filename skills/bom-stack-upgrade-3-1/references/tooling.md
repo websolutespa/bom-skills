@@ -111,7 +111,23 @@ Declare `rimraf` 6.1.3 in every package whose scripts call it.
      "VERCEL"
 ```
 
-Turbo 2.11 needs no other schema change from 2.8.
+**The `dev` task must not depend on `^dev`.** Turbo 2.11 stopped letting `--parallel` skip task dependencies. With `"dependsOn": ["^dev"]`, a dev run (`bom dev:<sample>:web`, `bom dev:bowl`, …) starts only the first dependency's watch task, for example `@websolutespa/bom-cli#dev` (`tsup --watch`). That task never exits, so the app's own `dev` never starts: no `next dev` output, no port 3000/4000. Remove the dependency, from the root `turbo.json` and from any nested one:
+
+```diff
+     "dev": {
+       "cache": false,
+-      "dependsOn": [
+-        "^dev"
+-      ],
+       "outputs": [
+         "dist/**"
+       ]
+     },
+```
+
+Watch tasks are independent anyway; turbo runs them side by side. Check it with `npx turbo run dev --filter=<web app> --dry=json`, or by running the dev command and confirming that the app's `next dev` prints `Ready`.
+
+Turbo 2.11 needs no other schema change from 2.8. The `--no-daemon` and `--parallel` warnings printed by `bom` commands are harmless deprecation notices.
 
 ## `.gitignore`
 
