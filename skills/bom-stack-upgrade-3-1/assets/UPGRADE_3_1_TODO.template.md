@@ -47,6 +47,14 @@ How to use:
 - [ ] `.esproj`: Vitest
 - [ ] Verification: `turbo run types` passes; `turbo run lint` reports 0 errors (record the warning count: ____)
 
+## Phase 2b: deployment env vars (references/deployment-env.md)
+
+- [ ] Every Dockerfile and `docker-compose.yml` that mentions `IMAGE_SECRET` also passes `MIXER_SECRET` (ARG, `.env.production` echo, compose build arg)
+- [ ] Other `process.env.*` variables audited against Dockerfile ARGs, compose args/environment and `turbo.json` globalEnv
+- [ ] Builder `.env*` files are not copied into the runtime image
+- [ ] Mixer runtime stage copies the standalone `node_modules` to its builder path, so Turbopack's hashed `.next/node_modules/<pkg>-<hash>` links resolve (or `[skip]` if there are none)
+- [ ] Verification: `docker compose build mixer` passes and a page loads from the running container (no `Cannot find module '<pkg>-<hash>'`), or `build:web` fails on `/404` without `MIXER_SECRET` and passes with it
+
 ## Phase 3: Payload 3.91 (references/payload-3-91.md)
 
 - [ ] `npm run generate` (importmap + types) in the Bowl app
@@ -93,6 +101,7 @@ How to use:
 ## Manual follow-ups for the user (the agent can't verify these)
 
 - [ ] Hosting and CI run Node 24.22 (≥ 22.13)
+- [ ] `MIXER_SECRET` set (non-empty, available at build time) in Coolify/Vercel/CI for every Mixer deployment
 - [ ] `AZURE_STORAGE_CONTAINER_ACCESS` set where public media blobs are expected
 - [ ] External integrations that call the Bowl REST API with a session cookie send `Origin`
 - [ ] Editors told: uploads are capped at 50 MB, SVGs are validated, API keys can't be read back

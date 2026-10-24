@@ -18,7 +18,7 @@ Read the whole `SKILL.md` first. Then read the reference file for the phase you 
    - it is already on 3.1 (`@websolutespa/*` `^3.1`, `payload >= 3.91.0`);
    - 3.1 is not published yet.
 2. **Resumable checklist.** Create or resume `bom-upgrade/UPGRADE_3_1_TODO.md` from [assets/UPGRADE_3_1_TODO.template.md](../../.claude/skills/bom-stack-upgrade-3-1/assets/UPGRADE_3_1_TODO.template.md). Read it before starting, and keep it updated as you go.
-3. **Phase order.** Work through the phases in order: dependencies → tooling → Payload 3.91 → Next 16.4 → code fixes → tests. Verify after each one. Skip what doesn't apply, and record `[skip] reason` in the checklist.
+3. **Phase order.** Work through the phases in order: dependencies → tooling → deployment env vars (Dockerfiles, compose) → Payload 3.91 → Next 16.4 → code fixes → tests. Verify after each one. Skip what doesn't apply, and record `[skip] reason` in the checklist.
 4. **Exact versions.** Use the versions in `references/dependencies.md`. Never upgrade a package listed in `references/held-back.md`; in particular, **styled-components stays on 5.3.11**.
 5. **Verify, don't assume.** After each phase run `npm install`, `npx turbo run types`, `npx turbo run lint` (0 errors), `npx turbo run test`, and the app builds. Fix what each phase surfaces before moving on.
 6. **Keep the diff reviewable.**
