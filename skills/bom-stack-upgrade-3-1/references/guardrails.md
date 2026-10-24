@@ -42,7 +42,7 @@ Also confirm that 3.1 is actually published: `npm view @websolutespa/bom-core ve
 
 - **Resuming.** `bom-upgrade/UPGRADE_3_1_TODO.md` exists → continue from the first unchecked item, whatever step C found.
 - **Bom-stack 2.x.** `payload` major is below 3, or any `@websolutespa/*` major is below 3 → **stop**. Tell the user to run the `bom-stack-upgrade` skill (2.x → 3.x) first.
-- **Already on 3.1.** Every `@websolutespa/*` is at `^3.1.0` or later, and `payload` is at `>= 3.91.0` → **stop** and say so. Change nothing.
+- **Already on 3.1.** Every `@websolutespa/*` is at `^3.1.0` or later, and `payload` is at `>= 3.91.0` → **stop** and say so. Change nothing. To move on to 4.x (the bom-sample App Router stack), suggest the `bom-stack-upgrade-4-0` skill.
 - **Eligible.** `payload` is at `3.x < 3.91` and the `@websolutespa/*` ranges are `^3.0.x` → create the checklist and start phase 1.
 - **Mixed or ambiguous.** For example, `@websolutespa/*` is already on 3.1 but `payload` is still 3.74, which is a half-done manual upgrade. Show the user what you found and ask one question. Usually the answer is to continue from phase 1, which is idempotent.
 
