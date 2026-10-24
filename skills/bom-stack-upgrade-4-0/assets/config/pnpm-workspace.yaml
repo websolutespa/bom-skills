@@ -1,0 +1,23 @@
+# pnpm settings of this single-package project (the same settings bom create writes for a generated project)
+
+# pnpm 11: build scripts are denied unless listed here
+allowBuilds:
+  '@swc/core': true
+  # the cli binary comes from its per-platform optional packages, the postinstall download is not needed
+  '@sentry/cli': false
+  esbuild: true
+  # @websolutespa/test: in-memory mongo for payload integration suites
+  mongodb-memory-server: true
+  sharp: true
+  unrs-resolver: true
+
+# pnpm 11 installs only versions published at least a day ago: the @websolutespa packages are
+# released and consumed together (a new pre-release is installed the day it is published)
+minimumReleaseAgeExclude:
+  - '@websolutespa/*'
+
+# a single next, @payloadcms/ui and styled-components instance: auto-installed peers of different
+# versions (@babel/core, its debug peer supports-color) create duplicate instances
+overrides:
+  '@babel/core': '^7.29.0'
+  'supports-color': '^7.2.0'
