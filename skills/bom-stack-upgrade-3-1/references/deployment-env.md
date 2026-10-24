@@ -90,17 +90,31 @@ Error: Cannot find module 'react-error-boundary-7c9546dab3426252'
 
 It works locally, because the standalone folder exists on disk at the same path.
 
-Fix it in the runtime stage of `src/mixer/Dockerfile`: put the standalone `node_modules` at the path the links reference. The runtime `WORKDIR` must be the same as the builder's (`/app`):
+Fix it in the runtime stage of `src/mixer/Dockerfile`: re-point every hashed link to the package in the `node_modules` that the stage already copies. The loop strips the `-<hash>` suffix, and handles the scoped `@websolutespa` folder, which holds links of its own:
 
 ```diff
  COPY --from=pruner /app/src/mixer/public ./public
-+# Turbopack loads some packages through hashed symlinks (.next/node_modules/<pkg>-<hash>) whose absolute
-+# targets are inside the builder's standalone folder. Provide the same path so they resolve at runtime.
-+COPY --from=builder /app/src/mixer/web/.next/standalone/node_modules /app/src/mixer/web/.next/standalone/node_modules
++# Turbopack externalizes some packages as hashed symlinks (.next/node_modules/<pkg>-<hash>) with absolute
++# targets inside the builder stage. Relink them to the node_modules copied above, or SSR fails with
++# "Cannot find module '<pkg>-<hash>'".
++RUN set -e; \
++  for l in .next/node_modules/*; do \
++    n=$(basename "$l"); \
++    if [ -d "$l" ] && [ ! -L "$l" ]; then \
++      for s in "$l"/*; do \
++        sn=$(basename "$s"); \
++        ln -sfn "/app/node_modules/$n/${sn%-*}" "$s"; \
++      done; \
++    else \
++      ln -sfn "/app/node_modules/${n%-*}" "$l"; \
++    fi; \
++  done
  ENV NODE_ENV=production
 ```
 
-Keep it as a `COPY`. Don't rewrite the links with a shell loop, and don't change `next.config.ts` to hide the problem. If the app folder or the `WORKDIR` changes, update the path.
+The runtime stage must keep `COPY --from=builder /app/node_modules ./node_modules`, because the links now point there.
+
+Don't replace the loop with a `COPY` of the builder's `.next/standalone/node_modules` to the same absolute path. It looks simpler, but in a real deployment the "Internal Server Error" came back. Don't change `next.config.ts` to hide the problem either.
 
 Check whether the project is affected before changing anything:
 

@@ -52,7 +52,7 @@ How to use:
 - [ ] Every Dockerfile and `docker-compose.yml` that mentions `IMAGE_SECRET` also passes `MIXER_SECRET` (ARG, `.env.production` echo, compose build arg)
 - [ ] Other `process.env.*` variables audited against Dockerfile ARGs, compose args/environment and `turbo.json` globalEnv
 - [ ] Builder `.env*` files are not copied into the runtime image
-- [ ] Mixer runtime stage copies the standalone `node_modules` to its builder path, so Turbopack's hashed `.next/node_modules/<pkg>-<hash>` links resolve (or `[skip]` if there are none)
+- [ ] Mixer runtime stage relinks Turbopack's hashed `.next/node_modules/<pkg>-<hash>` symlinks to `/app/node_modules` (or `[skip]` if there are none)
 - [ ] Verification: `docker compose build mixer` passes and a page loads from the running container (no `Cannot find module '<pkg>-<hash>'`), or `build:web` fails on `/404` without `MIXER_SECRET` and passes with it
 
 ## Phase 3: Payload 3.91 (references/payload-3-91.md)
