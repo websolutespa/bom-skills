@@ -1,17 +1,17 @@
 ---
 name: bom-stack-upgrade-4-0
-description: 'Upgrade a Websolute BOM-stack project to the bom-sample 4.0.0-next.7 stack: one Next.js 16.4 App Router app with Payload 3.91 embedded and the @websolutespa/bom-next frontend, on pnpm 11, Node 24.22, TypeScript 6, Vitest 5, Playwright 1.64, oxlint and oxfmt (@websolutespa/oxc). USE FOR: a 4.0 App Router project on an older 4.0.0-next.x (dependencies, schema-dts 2 peer, ESLint+Prettier → oxlint+oxfmt, pnpm 11 settings, TS 6, Vitest 5 configs and mock types, Next 16.4 dev effect fixes, regenerated Payload types); a 3.1 Bowl+Mixer monorepo moving to the bom-sample App Router architecture; and routing 3.0.x / 2.x projects through the earlier skills first. DO NOT USE on a repo that is not a BOM-stack project or one already on the bom-sample 4.0.0-next.7 stack — run the guardrail check first. Resumable via a local todo checklist.'
+description: 'Upgrade a Websolute BOM-stack project to the bom-sample 4.0.0-next.8 stack: one Next.js 16.4 App Router app with Payload 3.91 embedded and the @websolutespa/bom-next frontend, on pnpm 11, Node 24.22, TypeScript 6, Vitest 5, Playwright 1.64, oxlint and oxfmt (@websolutespa/oxc). USE FOR: a 4.0 App Router project on an older 4.0.0-next.x (dependencies, schema-dts 2 peer, ESLint+Prettier → oxlint+oxfmt, pnpm 11 settings, TS 6, Vitest 5 configs and mock types, Next 16.4 dev effect fixes, regenerated Payload types); a 3.1 Bowl+Mixer monorepo moving to the bom-sample App Router architecture; and routing 3.0.x / 2.x projects through the earlier skills first. DO NOT USE on a repo that is not a BOM-stack project or one already on the bom-sample 4.0.0-next.8 stack — run the guardrail check first. Resumable via a local todo checklist.'
 argument-hint: 'Path to the project root (defaults to workspace root)'
 ---
 
-# BOM Stack → 4.0 (bom-sample 4.0.0-next.7) upgrade
+# BOM Stack → 4.0 (bom-sample 4.0.0-next.8) upgrade
 
-Brings a BOM-stack project to the stack of **bom-sample** on `4.0.0-next.7`, the reference 4.x project:
+Brings a BOM-stack project to the stack of **bom-sample** on `4.0.0-next.8`, the reference 4.x project:
 
 | Area | Target |
 |---|---|
 | Architecture | one Next.js App Router app: Payload admin under `src/app/(payload)`, the site under `src/app/(frontend)/[market]/[locale]`, built on `@websolutespa/bom-next` |
-| `@websolutespa/*` | `^4.0.0-next.7` (`next` dist-tag), all together, plus `@websolutespa/oxc` |
+| `@websolutespa/*` | `^4.0.0-next.8` (`next` dist-tag), all together, plus `@websolutespa/oxc` |
 | Next.js / React | 16.4.2 / 19.2.x |
 | Payload / `@payloadcms/*` | 3.91.0, all the same version |
 | Node / pnpm | 24.22.1 / 11.28.8 (corepack) |
@@ -45,7 +45,7 @@ powershell -ExecutionPolicy Bypass -File .agents/skills/bom-stack-upgrade-4-0/sc
 
 ## 0. Guardrails: run first, every time
 
-Run [references/guardrails.md](./references/guardrails.md) before touching any file. It decides the path above, checks that `4.0.0-next.7` (and `@websolutespa/oxc`) is published, and stops on a dirty working tree until the user decides.
+Run [references/guardrails.md](./references/guardrails.md) before touching any file. It decides the path above, checks that `4.0.0-next.8` (and `@websolutespa/oxc`) is published, and stops on a dirty working tree until the user decides.
 
 ## 1. Create or resume the todo checklist
 
@@ -60,7 +60,7 @@ Run [references/guardrails.md](./references/guardrails.md) before touching any f
 | # | Phase | Reference |
 |---|-------|-----------|
 | A1 | Runtime and pnpm 11: Node 24.22.1, `packageManager`, `pnpm-workspace.yaml` settings, Docker | [references/toolchain.md](./references/toolchain.md) §1 |
-| A2 | Dependencies: `@websolutespa/*` 4.0.0-next.7, Next 16.4.2, Payload 3.91.0, `schema-dts` 2.1.0, regenerated Payload types | [references/dependencies.md](./references/dependencies.md) |
+| A2 | Dependencies: `@websolutespa/*` 4.0.0-next.8, Next 16.4.2, Payload 3.91.0, `schema-dts` 2.1.0, regenerated Payload types | [references/dependencies.md](./references/dependencies.md) |
 | A3 | TypeScript 6 | [references/toolchain.md](./references/toolchain.md) §2 |
 | A4 | Tests: Vitest 5 on `@websolutespa/test/vitest`, Playwright 1.64.1, mock types | [references/toolchain.md](./references/toolchain.md) §3 |
 | A5 | oxlint replaces ESLint (`@websolutespa/oxc/oxlint`), project rules ported | [references/toolchain.md](./references/toolchain.md) §4 |

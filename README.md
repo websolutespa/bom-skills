@@ -7,7 +7,7 @@ This repository is installable with `npx skills` and ships these skills:
 - `bom-stack-upgrade` - guided migration from BOM-stack 2.x to 3.x.
 - `bom-stack-upgrade-3-1` - guided upgrade of a BOM-stack 3.0.x project to the
   3.1 release (Payload 3.91, Next.js 16.4, TypeScript 6, ESLint 10, Vitest 5).
-- `bom-stack-upgrade-4-0` - guided upgrade to the bom-sample 4.0.0-next.7 stack:
+- `bom-stack-upgrade-4-0` - guided upgrade to the bom-sample 4.0.0-next.8 stack:
   one Next.js 16.4 App Router app with Payload 3.91 and `@websolutespa/bom-next`,
   pnpm 11, TypeScript 6, Vitest 5, oxlint and oxfmt (`@websolutespa/oxc`).
 

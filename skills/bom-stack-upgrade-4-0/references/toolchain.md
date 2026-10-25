@@ -17,7 +17,7 @@ Check: `corepack pnpm install --frozen-lockfile` passes; `pnpm why next` shows o
 
 ## 2. TypeScript 6 (A3)
 
-- `typescript`: `6.0.3`; `@websolutespa/tsconfig` `^4.0.0-next.7` is already TS 6 ready.
+- `typescript`: `6.0.3`; `@websolutespa/tsconfig` `^4.0.0-next.8` is already TS 6 ready.
 - Remove `"baseUrl": "."` from `tsconfig.json` (deprecated in TS 6). `paths` stay as they are: they resolve relative to the tsconfig.
 - If a global type stops resolving, add it to `compilerOptions.types` or a `/// <reference types="…" />`.
 
@@ -25,7 +25,7 @@ Check: `pnpm run types:check`.
 
 ## 3. Tests (A4)
 
-- `vitest` `5.0.5`, `@websolutespa/test` `^4.0.0-next.7`, `jsdom` `30.1.3` (devDependencies; move it out of `dependencies` if the app code doesn't import it), `@testing-library/react` `16.3.3`, `@playwright/test` `1.64.1`.
+- `vitest` `5.0.5`, `@websolutespa/test` `^4.0.0-next.8`, `jsdom` `26.1.0` (devDependencies, it also satisfies the payload-utils peer, see [dependencies.md](./dependencies.md); move it out of `dependencies` if the app code doesn't import it; drop a `jsdom` override), `@testing-library/react` `16.3.3`, `@playwright/test` `1.64.1`.
 - Remove `@vitejs/plugin-react` and `vite-tsconfig-paths`: the shared config includes react and Vitest 5 resolves tsconfig paths itself.
 - `vitest.config.mts` uses the shared factory ([../assets/config/vitest.config.mts](../assets/config/vitest.config.mts)): `defineDomConfig` (jsdom + `@testing-library/jest-dom` matchers), `defineNodeConfig` or `definePayloadConfig`. Keep the project's `setupFiles`, `include` and `exclude`. Files with `// @vitest-environment node` keep working.
 - The shared config inlines `@websolutespa/*` (`server.deps.inline`): Vitest compiles them like Next does, so their extensionless imports (`next/server`) resolve.
@@ -46,7 +46,7 @@ Check: `pnpm run test:integration`, `pnpm run types:check` (tests are type-check
 
 `@websolutespa/oxc` is published from `4.0.0-next.7`. Only `@websolutespa/eslint-config@4.0.0-next.6` exported `./oxlint`: a project that used it (often with a local `.d.ts` declaring the module) switches the import to `@websolutespa/oxc/oxlint` and deletes the declaration; `@websolutespa/eslint-config` 4.0.0-next.7 and later is the ESLint 10 configs only.
 
-- Add `oxlint` `1.89.0`, `oxlint-tsgolint` `7.0.2005`, `@websolutespa/oxc` `^4.0.0-next.7`. Remove `eslint`, `eslint-config-next`, `@websolutespa/eslint-config`, every `eslint.config.*` and any local `.d.ts` that declared `@websolutespa/eslint-config/oxlint`.
+- Add `oxlint` `1.89.0`, `oxlint-tsgolint` `7.0.2005`, `@websolutespa/oxc` `^4.0.0-next.8`. Remove `eslint`, `eslint-config-next`, `@websolutespa/eslint-config`, every `eslint.config.*` and any local `.d.ts` that declared `@websolutespa/eslint-config/oxlint`.
 - Script: `"lint": "oxlint --type-aware"` (Next 16 removed `next lint`).
 - `oxlint.config.ts` uses the shared `next` preset ([../assets/config/oxlint.config.ts](../assets/config/oxlint.config.ts)). The presets are complete configs (rules, overrides, plugins); extend them by spreading, never with `extends`.
 - **Port project rules.** Translate each custom rule of the old `eslint.config.*` to oxlint and verify it with a probe file. bom-sample's request-data rule:

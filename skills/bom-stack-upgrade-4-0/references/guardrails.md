@@ -31,8 +31,8 @@ From each `package.json` (and the lockfile for `latest`, `*` or `next` ranges):
 Confirm the target is published:
 
 ```sh
-npm view @websolutespa/bom-next dist-tags      # next: 4.0.0-next.7 or later 4.0.0-next.N
-npm view @websolutespa/oxc dist-tags            # next: 4.0.0-next.7 or later
+npm view @websolutespa/bom-next dist-tags      # next: 4.0.0-next.8 or later 4.0.0-next.N
+npm view @websolutespa/oxc dist-tags            # next: 4.0.0-next.8 or later
 ```
 
 If `@websolutespa/oxc` is not published, **stop**: phases A5 and A6 depend on it.
@@ -44,7 +44,7 @@ If `@websolutespa/oxc` is not published, **stop**: phases A5 and A6 depend on it
 - **bom-stack 3.0.x monorepo** (`@websolutespa/*` `^3.0.x`, `payload` < 3.91) → **stop**: run `bom-stack-upgrade-3-1` first.
 - **bom-stack 3.1 monorepo** (`@websolutespa/*` `^3.1.x`, `payload` 3.91) → **path B**. Show the user the plan in `monorepo-to-app-router.md` and get an explicit go-ahead before any edit.
 - **4.0 App Router project** (`@websolutespa/bom-next` `4.0.0-next.0` … `4.0.0-next.6`, or bom-next `3.0.x` with Payload 3.x) → **path A**.
-- **Already on the target** (every `@websolutespa/*` at `^4.0.0-next.7` or later, `@websolutespa/oxc` present, `payload` 3.91, `next` 16.4, `typescript` 6, `vitest` 5, `oxlint` and `oxfmt` in use, no `eslint`/`prettier`) → **stop** and say so.
+- **Already on the target** (every `@websolutespa/*` at `^4.0.0-next.8` or later, `@websolutespa/oxc` present, `payload` 3.91, `next` 16.4, `typescript` 6, `vitest` 5, `oxlint` and `oxfmt` in use, no `eslint`/`prettier`) → **stop** and say so.
 - **Mixed or ambiguous** (a half-done manual upgrade) → show the user what you found and ask one question. Usually: continue path A from A1, every phase is idempotent.
 
 ## Step E: never be destructive

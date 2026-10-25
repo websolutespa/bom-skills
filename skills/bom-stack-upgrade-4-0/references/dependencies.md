@@ -1,10 +1,10 @@
 # Dependencies (phase A2)
 
-Target: the versions of bom-sample on `4.0.0-next.7`. Change them all in one commit, then regenerate the lockfile with `corepack pnpm install`.
+Target: the versions of bom-sample on `4.0.0-next.8`. Change them all in one commit, then regenerate the lockfile with `corepack pnpm install`.
 
 ## `@websolutespa/*`: one release line
 
-Every `@websolutespa/*` dependency, devDependency and peerDependency moves to `^4.0.0-next.7` at the same time. A 4.x project never mixes 3.x and 4.x packages: their peer ranges don't match prereleases.
+Every `@websolutespa/*` dependency, devDependency and peerDependency moves to `^4.0.0-next.8` at the same time. A 4.x project never mixes 3.x and 4.x packages: their peer ranges don't match prereleases.
 
 | Package | Where | Note |
 |---|---|---|
@@ -42,7 +42,7 @@ Packages outside the release line (e.g. `@websolutespa/bom-pilot`) keep their ow
 | `vitest` | `5.0.5` |
 | `@playwright/test` | `1.64.1` (remove `playwright` and `playwright-core` if listed) |
 | `@testing-library/react` | `16.3.3` |
-| `jsdom` | `30.1.3` (devDependencies; tests only) |
+| `jsdom` | `26.1.0` (devDependencies). It also satisfies the `jsdom` peer of `@websolutespa/payload-utils`: jsdom 30 requires the ESM-only `@exodus/bytes` and fails with `ERR_REQUIRE_ESM` on Vercel. Remove a `jsdom` entry from `pnpm-workspace.yaml` `overrides`; it is no longer needed from `4.0.0-next.8`. |
 | `oxlint` / `oxlint-tsgolint` / `oxfmt` | `1.89.0` / `7.0.2005` / `0.74.0` |
 | removed | `eslint`, `eslint-config-next`, `@websolutespa/eslint-config`, `prettier`, `@vitejs/plugin-react`, `vite-tsconfig-paths` |
 
