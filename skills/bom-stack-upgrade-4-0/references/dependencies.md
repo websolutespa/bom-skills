@@ -1,10 +1,10 @@
 # Dependencies (phase A2)
 
-Target: the versions of bom-sample on `4.0.0-next.6`. Change them all in one commit, then regenerate the lockfile with `corepack pnpm install`.
+Target: the versions of bom-sample on `4.0.0-next.7`. Change them all in one commit, then regenerate the lockfile with `corepack pnpm install`.
 
 ## `@websolutespa/*`: one release line
 
-Every `@websolutespa/*` dependency, devDependency and peerDependency moves to `^4.0.0-next.6` at the same time. A 4.x project never mixes 3.x and 4.x packages: their peer ranges don't match prereleases.
+Every `@websolutespa/*` dependency, devDependency and peerDependency moves to `^4.0.0-next.7` at the same time. A 4.x project never mixes 3.x and 4.x packages: their peer ranges don't match prereleases.
 
 | Package | Where | Note |
 |---|---|---|

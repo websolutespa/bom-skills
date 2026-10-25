@@ -1,6 +1,6 @@
 # Path B: 3.1 monorepo → bom-sample App Router architecture
 
-A 3.1 project (turborepo: `src/bowl/payload` Payload app on :4000, `src/mixer/web` Pages Router site on `@websolutespa/bom-mixer-*`, local `src/mixer/packages/{models,ui,icons}`) becomes one Next.js App Router app like **bom-sample** (`websolute-dev/bom-sample`, branch `next`, on `4.0.0-next.6`). bom-sample is the reference implementation: read its `.claude/CLAUDE.md` and `.claude/skills/*` before porting anything.
+A 3.1 project (turborepo: `src/bowl/payload` Payload app on :4000, `src/mixer/web` Pages Router site on `@websolutespa/bom-mixer-*`, local `src/mixer/packages/{models,ui,icons}`) becomes one Next.js App Router app like **bom-sample** (`websolute-dev/bom-sample`, branch `next`, on `4.0.0-next.7`). bom-sample is the reference implementation: read its `.claude/CLAUDE.md` and `.claude/skills/*` before porting anything.
 
 **This is not a mechanical upgrade.** The two architectures don't share a frontend stack:
 

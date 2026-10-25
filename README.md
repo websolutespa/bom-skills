@@ -7,7 +7,7 @@ This repository is installable with `npx skills` and ships these skills:
 - `bom-stack-upgrade` - guided migration from BOM-stack 2.x to 3.x.
 - `bom-stack-upgrade-3-1` - guided upgrade of a BOM-stack 3.0.x project to the
   3.1 release (Payload 3.91, Next.js 16.4, TypeScript 6, ESLint 10, Vitest 5).
-- `bom-stack-upgrade-4-0` - guided upgrade to the bom-sample 4.0.0-next.6 stack:
+- `bom-stack-upgrade-4-0` - guided upgrade to the bom-sample 4.0.0-next.7 stack:
   one Next.js 16.4 App Router app with Payload 3.91 and `@websolutespa/bom-next`,
   pnpm 11, TypeScript 6, Vitest 5, oxlint and oxfmt (`@websolutespa/oxc`).
 
@@ -18,7 +18,7 @@ Which one to run depends on the project's current version:
 | bom-stack 2.x (Payload 2, Next 14) | `bom-stack-upgrade`, then `bom-stack-upgrade-3-1`, then `bom-stack-upgrade-4-0` |
 | bom-stack 3.0.x (Payload 3.74, Next 16.1) | `bom-stack-upgrade-3-1`, then `bom-stack-upgrade-4-0` |
 | bom-stack 3.1 monorepo (Bowl + Mixer Pages Router) | `bom-stack-upgrade-4-0` (path B: rebuild on the bom-sample App Router architecture, then path A) |
-| 4.0 App Router project (bom-next 4.0.0-next.0 … .5) | `bom-stack-upgrade-4-0` (path A: stack and toolchain) |
+| 4.0 App Router project (bom-next 4.0.0-next.0 … .6) | `bom-stack-upgrade-4-0` (path A: stack and toolchain) |
 
 Every skill starts with a guardrail check and stops if the project is on the
 wrong version.
