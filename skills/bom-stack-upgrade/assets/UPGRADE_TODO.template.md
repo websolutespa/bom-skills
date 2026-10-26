@@ -50,6 +50,7 @@ How to use:
 - [ ] `secret` set from `PAYLOAD_SECRET`
 - [ ] `admin.importMap`, `admin.meta.icons/openGraph` added; old `admin.bundler`/`webpack`/`css` removed
 - [ ] Storage plugin swapped to `storagePlugin(...)`
+- [ ] Committed `.env` has no secrets and no `KEY='KEY'` placeholders for variables Payload 3 now reads (`S3_STORAGE_ENDPOINT` must be empty or a URL)
 - [ ] SEO plugin swapped to `seoPlugin(...)` (function `fields`)
 - [ ] `i18n` shape updated (`fallbackLanguage`, `translations`)
 - [ ] `express` option removed

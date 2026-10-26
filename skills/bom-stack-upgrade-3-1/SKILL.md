@@ -60,7 +60,7 @@ Run the checks in [references/guardrails.md](./references/guardrails.md) before 
 |---|-------|-----------|-------|
 | 1 | Dependencies | [references/dependencies.md](./references/dependencies.md) | every `package.json`, `.nvmrc`, Dockerfiles |
 | 2 | Tooling | [references/tooling.md](./references/tooling.md) | tsconfig (TS 6), ESLint 10 scripts, `turbo.json` env, rimraf 6 scripts, `.gitignore` |
-| 2b | Deployment | [references/deployment-env.md](./references/deployment-env.md) | `Dockerfile`s, `docker-compose.yml`, `MIXER_SECRET`, hosting build variables, Turbopack hashed externals in the Mixer runtime image |
+| 2b | Deployment | [references/deployment-env.md](./references/deployment-env.md) | `Dockerfile`s, `docker-compose.yml`, `MIXER_SECRET`, hosting build variables, secrets and placeholders in committed `.env` files, Mixer runtime image (full standalone copy) |
 | 3 | Payload 3.91 | [references/payload-3-91.md](./references/payload-3-91.md) | Bowl app: `payload.config.ts`, `next.config.ts`, generated files, security defaults, env vars |
 | 4 | Next 16.4 (Mixer) | [references/next-16-4.md](./references/next-16-4.md) | Mixer web: `next.config.ts` images, `proxy.ts`, lint |
 | 5 | Code fixes | [references/code-fixes.md](./references/code-fixes.md) | async `renderEmail`, library majors, TS 6 type errors, undeclared and cross-project imports |
@@ -88,6 +88,8 @@ The upgrade is done when every checklist item is checked or skipped with a reaso
 - what was skipped, and why;
 - the manual follow-ups (see the template's last section). These are:
   - `MIXER_SECRET` set as a build-time variable on every hosting dashboard (Coolify, Vercel, CI);
+  - secrets removed from committed `.env` files set on the hosting before release, and rotated;
+  - on S3 projects, `S3_STORAGE_ENDPOINT` unset or a URL (never an ARN), and the right bucket per environment;
   - `AZURE_STORAGE_CONTAINER_ACCESS` on deployments that need public blobs;
   - the `Origin` header on scripts that call the Bowl REST API with a session cookie;
   - the Node 24.22 runtime on hosting and CI;

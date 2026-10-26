@@ -40,7 +40,7 @@ Every file that mentions `IMAGE_SECRET` must also mention `MIXER_SECRET`.
 
 The bom samples already do this. See `sample/basic/src/mixer/Dockerfile` and `sample/basic/docker-compose.yml` in the bom repo.
 
-Writing the secret into `.env.production` puts it in the builder stage only. The runtime stage copies `node_modules`, `.next/standalone`, `.next/static` and `public`, so keep it that way. Never `COPY` the builder's `.env*` into the runtime image. Also provide `MIXER_SECRET` to the runtime container as an environment variable, because the session and image routes need it there too.
+Writing the secret into `.env.production` doesn't keep it out of the runtime image. `next build` copies the app's `.env` and `.env.production` into `.next/standalone/<app path>/`, and the runtime stage copies the standalone tree (section 5). Don't add an explicit `COPY` of the builder's `.env*` on top of that. Also provide `MIXER_SECRET` to the runtime container as an environment variable, because the session and image routes need it there too.
 
 ## 2. Audit every other variable the same way
 
@@ -60,8 +60,9 @@ Typical gaps after a 3.1 upgrade:
 
 | Variable | Where it must be set |
 |---|---|
-| `MIXER_SECRET` | Mixer Dockerfile, compose args, runtime env |
+| `MIXER_SECRET` | Mixer Dockerfile, compose args, runtime env, `turbo.json` (next to `IMAGE_SECRET`) |
 | `AZURE_STORAGE_CONTAINER_ACCESS` | Bowl runtime env (phase 3), `turbo.json` |
+| `S3_STORAGE_*` (S3 projects) | Bowl runtime env, with no placeholders in the committed `.env` (section 4) |
 | `BOM_DB`, `BOM_TEST_DB` | `turbo.json` only |
 | `NEXT_PUBLIC_*` | Build time only. Next inlines them, so a runtime value has no effect |
 
@@ -71,50 +72,82 @@ The repo can't verify these, so list them under the manual follow-ups:
 
 - `MIXER_SECRET` exists, is non-empty, and is available at **build time** (Coolify: tick "Available at Buildtime"). A Coolify build log that lists `--build-arg 'MIXER_SECRET'` only shows the variable is declared, not that it has a value.
 - Build-time values must be real. `ARG X=secret` defaults hide a missing variable until runtime.
+- `PAYLOAD_SECRET` and the storage credentials are set on the Bowl service, now that the committed `.env` no longer carries them (section 4).
+- `S3_STORAGE_ENDPOINT` is either unset or a URL, for example `https://s3.eu-west-1.amazonaws.com`. A bucket ARN (`arn:aws:s3:::…`) is not a URL. Also check that `S3_STORAGE_BUCKET` is the bucket for that environment, not the dev bucket.
 
-## 4. Mixer runtime image: Turbopack hashed externals
+## 4. Committed env files: secrets and placeholders
 
-Next 16 builds with Turbopack. It doesn't bundle some packages (ESM packages imported from transpiled workspace packages, for example `react-error-boundary`, `lenis`, `motion`, `swiper`, `@websolutespa/bom-mixer-image`). It loads them at runtime through symlinks named after the package plus a hash:
+The Bowl runtime image contains the committed `src/bowl/payload/.env` (the standalone output copies it, and many Bowl Dockerfiles also `COPY .env*`). Next loads it at startup, and any variable the hosting doesn't set takes its value from there. Two consequences:
 
-```text
-.next/node_modules/react-error-boundary-7c9546dab3426252 -> /app/src/mixer/web/.next/standalone/node_modules/react-error-boundary
-.next/node_modules/@websolutespa/bom-mixer-image-cffff9afd519e2ba -> /app/src/mixer/web/.next/standalone/node_modules/@websolutespa/bom-mixer-image
+- **Placeholders become values.** Many projects commit `KEY='KEY'` placeholders. Payload 2 never read `S3_STORAGE_ENDPOINT`. In Payload 3, `@websolutespa/payload-plugin-storage` passes `getEnv('S3_STORAGE_ENDPOINT') || undefined` to the S3 client, so the placeholder `'S3_STORAGE_ENDPOINT'` becomes the endpoint. Every media request returns 500, and uploads fail with `TypeError: Invalid URL` (input `"S3_STORAGE_ENDPOINT"`). This works on a Payload 2 production and breaks as soon as the 3.x image is released.
+- **Secrets end up in the image.** A real `PAYLOAD_SECRET` (or `OVEN_API_KEY`, `STORE_API_KEY`, storage credentials) in a committed `.env` ships in every image and stays in git history.
+
+Fix:
+
+1. In the committed `.env`, leave the secrets and the `S3_STORAGE_*` variables empty (`S3_STORAGE_ENDPOINT=`). On AWS an empty endpoint is correct: the SDK derives it from `S3_STORAGE_REGION`, and the generated URLs are identical.
+2. Move the real values to `.env.local` (gitignored) for local development, and to the hosting dashboard for deployments (section 3). Set them on the hosting **before** releasing the image that drops them.
+3. A secret that was committed is in git history. Add a manual follow-up to rotate it. Rotating `PAYLOAD_SECRET` logs out admin sessions.
+
+Audit the committed env files without printing values. The command lists every key whose value is a placeholder (equal to the key name) or non-empty:
+
+```bash
+for f in $(git ls-files "**/.env" "**/.env.production"); do
+  awk -F= -v f="$f" '/^[A-Z]/{k=$1; v=substr($0,length(k)+2); gsub(/^'"'"'|'"'"'$/,"",v);
+    if (v==k) print f": "k" placeholder"; else if (v!="") print f": "k" set"}' "$f"
+done
 ```
 
-The link targets are **absolute paths inside the builder stage**. The runtime stage copies `.next/standalone/src/mixer/web` to `/app`, but not the standalone `node_modules` that the links point to. The build passes, `next start` boots, and every page returns "Internal Server Error":
+Every placeholder must be emptied. Every `set` key that is a secret must move to `.env.local` and the hosting.
+
+## 5. Mixer runtime image: Turbopack hashed externals
+
+Next 16 builds with Turbopack. It doesn't bundle some packages (ESM packages imported from transpiled workspace packages, for example `react-error-boundary`, `lenis`, `motion`, `swiper`, `@websolutespa/bom-mixer-image`). It loads them at runtime through symlinks named after the package plus a hash. The symlinks are **relative to the standalone root**:
+
+```text
+src/mixer/web/.next/standalone/src/mixer/web/.next/node_modules/
+  motion-b670d5115ae5de8a -> ../../../../../node_modules/motion
+  react-error-boundary-7c9546dab3426252 -> ../../../../../node_modules/react-error-boundary
+  @websolutespa/bom-mixer-image-<hash> -> ../../../../../../node_modules/@websolutespa/bom-mixer-image
+```
+
+Projects created before 3.1 copy only `.next/standalone/src/mixer/web` to `/app`, together with the builder's whole `node_modules`. The links then point outside the image. The build passes, `next start` boots, and every page returns "Internal Server Error":
 
 ```text
 Error: Failed to load external module react-error-boundary-7c9546dab3426252:
 Error: Cannot find module 'react-error-boundary-7c9546dab3426252'
 ```
 
-It works locally, because the standalone folder exists on disk at the same path.
+It works locally, because the standalone folder exists on disk.
 
-Fix it in the runtime stage of `src/mixer/Dockerfile`: re-point every hashed link to the package in the `node_modules` that the stage already copies. The loop strips the `-<hash>` suffix, and handles the scoped `@websolutespa` folder, which holds links of its own:
+Fix it in `src/mixer/Dockerfile`. The runtime stage copies the **whole** standalone tree, as the Bowl Dockerfile already does, so the relative links resolve as they are:
 
-```diff
- COPY --from=pruner /app/src/mixer/public ./public
-+# Turbopack externalizes some packages as hashed symlinks (.next/node_modules/<pkg>-<hash>) with absolute
-+# targets inside the builder stage. Relink them to the node_modules copied above, or SSR fails with
-+# "Cannot find module '<pkg>-<hash>'".
-+RUN set -e; \
-+  for l in .next/node_modules/*; do \
-+    n=$(basename "$l"); \
-+    if [ -d "$l" ] && [ ! -L "$l" ]; then \
-+      for s in "$l"/*; do \
-+        sn=$(basename "$s"); \
-+        ln -sfn "/app/node_modules/$n/${sn%-*}" "$s"; \
-+      done; \
-+    else \
-+      ln -sfn "/app/node_modules/${n%-*}" "$l"; \
-+    fi; \
-+  done
- ENV NODE_ENV=production
+```dockerfile
+# builder stage: stop here with a clear error if next build produced no standalone server
+RUN npm run build:web && test -f src/mixer/web/.next/standalone/src/mixer/web/server.js
+
+FROM base AS runtime
+WORKDIR /app
+# Next.js standalone output: copy the whole tree, the turbopack externals in .next/node_modules
+# are symlinks relative to the standalone root (e.g. motion-<hash> -> ../../../../../node_modules/motion)
+COPY --from=builder /app/src/mixer/web/.next/standalone ./
+COPY --from=builder /app/src/mixer/web/.next/static ./src/mixer/web/.next/static
+COPY --from=pruner /app/src/mixer/public ./src/mixer/web/public
+# bom-mixer-image caches resized images in <cwd>/.cache, server.js runs from its own folder
+RUN mkdir -p src/mixer/web/.cache
+ENV NODE_ENV=production
+EXPOSE 80
+ENV PORT=80
+ENV HOSTNAME="0.0.0.0"
+CMD ["pm2-runtime", "src/mixer/web/server.js"]
 ```
 
-The runtime stage must keep `COPY --from=builder /app/node_modules ./node_modules`, because the links now point there.
+Compared with the pre-3.1 runtime stage:
 
-Don't replace the loop with a `COPY` of the builder's `.next/standalone/node_modules` to the same absolute path. It looks simpler, but in a real deployment the "Internal Server Error" came back. Don't change `next.config.ts` to hide the problem either.
+- `COPY --from=builder /app/node_modules ./node_modules` goes away. The standalone tree has its own traced `node_modules`. On a real project this took the image from 3.86 GB to 2.45 GB, and removed a 7-minute copy step from the deploy.
+- Static files, `public` and the image cache move under `src/mixer/web/`, and the `CMD` points to `src/mixer/web/server.js`.
+- Without the `test -f` guard, a failed `next build` surfaces only later, as a confusing `not found` on the `COPY`.
+
+If the project already relinks the hashed links with a shell loop (`ln -sfn "/app/node_modules/${n%-*}"`), replace the loop with this stage. The loop depends on the `<pkg>-<hash>` naming and breaks if a future Next changes it.
 
 Check whether the project is affected before changing anything:
 
@@ -122,15 +155,17 @@ Check whether the project is affected before changing anything:
 ls -l src/mixer/web/.next/standalone/src/mixer/web/.next/node_modules
 ```
 
-If the directory has no hashed links, skip this section and mark the checklist item `[skip]`.
+If the directory has no hashed links, the old runtime stage still works. Adopting the standalone copy is optional then, but it keeps the image smaller.
 
 ## Verification
 
 ```bash
 docker compose build mixer
-docker compose run --rm --no-deps mixer ls -lL /app/.next/node_modules
+docker compose run --rm --no-deps mixer ls -lL /app/src/mixer/web/.next/node_modules
 ```
 
-The second command must list every hashed entry without a "No such file" error. Then request a page from the running container. A build that passes is not enough: this failure only shows at request time.
+The second command must list every hashed entry without a "No such file" error. Then start the container and request a page and an `/api/_image` URL, with the production `IMAGE_STRATEGY` (`token` included). A build that passes is not enough: this failure only shows at request time.
+
+For the Bowl, start the container with the `S3_STORAGE_*` variables unset, and open a media URL. It must not fail with `Invalid URL`. Then run the audit in section 4 again: it must print no placeholders and no secrets.
 
 If Docker isn't available locally, reproduce the failure mode: run `npm run build:web` after removing `MIXER_SECRET` from `src/mixer/web/.env.local` and from the shell. The build must fail on `/404`, and pass again once the variable is set. This confirms the variable is the only source of the secret.

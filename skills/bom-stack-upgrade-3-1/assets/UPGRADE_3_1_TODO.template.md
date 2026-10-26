@@ -50,10 +50,11 @@ How to use:
 ## Phase 2b: deployment env vars (references/deployment-env.md)
 
 - [ ] Every Dockerfile and `docker-compose.yml` that mentions `IMAGE_SECRET` also passes `MIXER_SECRET` (ARG, `.env.production` echo, compose build arg)
+- [ ] `turbo.json` globalEnv: + `MIXER_SECRET` (next to `IMAGE_SECRET`)
 - [ ] Other `process.env.*` variables audited against Dockerfile ARGs, compose args/environment and `turbo.json` globalEnv
-- [ ] Builder `.env*` files are not copied into the runtime image
-- [ ] Mixer runtime stage relinks Turbopack's hashed `.next/node_modules/<pkg>-<hash>` symlinks to `/app/node_modules` (or `[skip]` if there are none)
-- [ ] Verification: `docker compose build mixer` passes and a page loads from the running container (no `Cannot find module '<pkg>-<hash>'`), or `build:web` fails on `/404` without `MIXER_SECRET` and passes with it
+- [ ] Committed `.env` / `.env.production` files hold no secrets and no `KEY='KEY'` placeholders (empty `S3_STORAGE_*`, `PAYLOAD_SECRET` moved to `.env.local` and the hosting)
+- [ ] Mixer runtime stage copies the whole `.next/standalone` (CMD `src/mixer/web/server.js`, no `node_modules` copy, no symlink relink loop); the builder checks for the standalone `server.js` with `test -f`
+- [ ] Verification: `docker compose build mixer` passes, and a page and `/api/_image` load from the running container (no `Cannot find module '<pkg>-<hash>'`), or `build:web` fails on `/404` without `MIXER_SECRET` and passes with it
 
 ## Phase 3: Payload 3.91 (references/payload-3-91.md)
 
@@ -102,6 +103,8 @@ How to use:
 
 - [ ] Hosting and CI run Node 24.22 (≥ 22.13)
 - [ ] `MIXER_SECRET` set (non-empty, available at build time) in Coolify/Vercel/CI for every Mixer deployment
+- [ ] Secrets removed from the committed `.env` (`PAYLOAD_SECRET`, …) set on the hosting before release, and rotated (they are in git history)
+- [ ] S3 projects: `S3_STORAGE_ENDPOINT` on the hosting is unset or a URL (never a bucket ARN), and `S3_STORAGE_BUCKET` is the bucket for that environment
 - [ ] `AZURE_STORAGE_CONTAINER_ACCESS` set where public media blobs are expected
 - [ ] External integrations that call the Bowl REST API with a session cookie send `Origin`
 - [ ] Editors told: uploads are capped at 50 MB, SVGs are validated, API keys can't be read back

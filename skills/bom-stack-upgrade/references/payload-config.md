@@ -71,6 +71,12 @@ top-level scope (collections array, globals array, cors/csrf/serverURL/etc).
   The new plugin picks the adapter package (`@payloadcms/storage-azure`, `-gcs`,
   `-s3`) based on the `adapter` field — make sure the matching
   `@payloadcms/storage-*` dependency is installed (see dependencies.md).
+  With `adapter: 's3'` the plugin also reads `S3_STORAGE_ENDPOINT`, which
+  Payload 2 never used. Any non-empty value becomes the S3 client endpoint, so a
+  committed placeholder (`S3_STORAGE_ENDPOINT='S3_STORAGE_ENDPOINT'`) or a
+  bucket ARN breaks every media request with `TypeError: Invalid URL`. Leave it
+  empty in the committed `.env`: on AWS the SDK derives the endpoint from
+  `S3_STORAGE_REGION`.
 - `seoPlugin({ collections, globals, fields: (args) => [...args.defaultFields, ...], uploadsCollection, tabbedUI })`
   — `fields` is now a function receiving `defaultFields` instead of a static
   array; migrate any custom SEO fields accordingly.
