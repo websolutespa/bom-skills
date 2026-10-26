@@ -10,6 +10,9 @@ This repository is installable with `npx skills` and ships these skills:
 - `bom-stack-upgrade-4-0` - guided upgrade to the bom-sample 4.0.0-next.8 stack:
   one Next.js 16.4 App Router app with Payload 3.91 and `@websolutespa/bom-next`,
   pnpm 11, TypeScript 6, Vitest 5, oxlint and oxfmt (`@websolutespa/oxc`).
+- `node-upgrade` - upgrade of the Node.js runtime to a patched release (security
+  advisory or EOL line), with a test plan built from what changed between the
+  two versions. Works on any Node project.
 
 Which one to run depends on the project's current version:
 
@@ -20,8 +23,9 @@ Which one to run depends on the project's current version:
 | bom-stack 3.1 monorepo (Bowl + Mixer Pages Router) | `bom-stack-upgrade-4-0` (path B: rebuild on the bom-sample App Router architecture, then path A) |
 | 4.0 App Router project (bom-next 4.0.0-next.0 … .6) | `bom-stack-upgrade-4-0` (path A: stack and toolchain) |
 
-Every skill starts with a guardrail check and stops if the project is on the
-wrong version.
+Every bom-stack skill starts with a guardrail check and stops if the project is
+on the wrong version. They also set the Node version for the target release: use
+`node-upgrade` only to patch Node within a bom-stack version.
 
 ## Install
 
@@ -34,6 +38,7 @@ Install only one skill explicitly:
 ```bash
 npx skills add websolutespa/bom-skills --skill bom-stack-upgrade
 npx skills add websolutespa/bom-skills --skill bom-stack-upgrade-3-1
+npx skills add websolutespa/bom-skills --skill node-upgrade
 ```
 
 ## VS Code Prompt Templates
@@ -42,6 +47,7 @@ Each skill includes a VS Code prompt template:
 
 - `skills/bom-stack-upgrade/prompts/bom-stack-upgrade.prompt.md`
 - `skills/bom-stack-upgrade-3-1/prompts/bom-stack-upgrade-3-1.prompt.md`
+- `skills/node-upgrade/prompts/node-upgrade.prompt.md`
 
 `npx skills add` installs skills in the agent skills directory; it does not
 automatically copy prompt files into your project `.github/prompts` folder.
@@ -54,12 +60,14 @@ into a target project:
 ```powershell
 powershell -ExecutionPolicy Bypass -File .agents/skills/bom-stack-upgrade/scripts/install-vscode-prompts.ps1 -ProjectRoot .
 powershell -ExecutionPolicy Bypass -File .agents/skills/bom-stack-upgrade-3-1/scripts/install-vscode-prompts.ps1 -ProjectRoot .
+powershell -ExecutionPolicy Bypass -File .agents/skills/node-upgrade/scripts/install-vscode-prompts.ps1 -ProjectRoot .
 ```
 
 After running them, you will have:
 
 - `.github/prompts/bom-stack-upgrade.prompt.md`
 - `.github/prompts/bom-stack-upgrade-3-1.prompt.md`
+- `.github/prompts/node-upgrade.prompt.md`
 
 ## Repository Layout
 
@@ -76,6 +84,10 @@ skills/
 		assets/          (checklist template, test files from the bom samples)
 		prompts/
 		references/
+		scripts/
+	node-upgrade/
+		SKILL.md
+		prompts/
 		scripts/
 ```
 

@@ -10,6 +10,13 @@
         "bom-stack-upgrade-3-1",
         "bom-stack-upgrade-4-0"
       ]
+    },
+    {
+      "title": "Maintenance",
+      "description": "General maintenance skills for Node.js projects, BOM-stack or not.",
+      "skills": [
+        "node-upgrade"
+      ]
     }
   ]
 }
