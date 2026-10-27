@@ -85,8 +85,8 @@ The Bowl runtime image contains the committed `src/bowl/payload/.env` (the stand
 Fix:
 
 1. In the committed `.env`, leave the secrets and the `S3_STORAGE_*` variables empty (`S3_STORAGE_ENDPOINT=`). On AWS an empty endpoint is correct: the SDK derives it from `S3_STORAGE_REGION`, and the generated URLs are identical.
-2. Move the real values to `.env.local` (gitignored) for local development, and to the hosting dashboard for deployments (section 3). Set them on the hosting **before** releasing the image that drops them.
-3. A secret that was committed is in git history. Add a manual follow-up to rotate it. Rotating `PAYLOAD_SECRET` logs out admin sessions.
+2. Move the real values to `.env.local` (gitignored) for local development, and to the hosting dashboard for deployments (section 3). Set them on the hosting, with the **current** values, **before** releasing the image that drops them. A Bowl without `PAYLOAD_SECRET` builds fine and then fails every request with `Error: missing secret key. A secret key is needed to secure Payload.` Coolify's build log lists the variables it passes (`--build-arg '…'`): if `PAYLOAD_SECRET` is not there, it is not set.
+3. A secret that was committed is in git history. Add a manual follow-up to rotate it, as a separate step after the release. Rotating `PAYLOAD_SECRET` logs out admin sessions **and invalidates every API key**: Payload finds a key by an HMAC of the secret (`apiKeyIndex`). The Oven authenticates to the Bowl with an API key, so regenerate that key in the admin and update it on the Oven's hosting in the same step.
 
 Audit the committed env files without printing values. The command lists every key whose value is a placeholder (equal to the key name) or non-empty:
 

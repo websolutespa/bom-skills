@@ -88,7 +88,7 @@ The upgrade is done when every checklist item is checked or skipped with a reaso
 - what was skipped, and why;
 - the manual follow-ups (see the template's last section). These are:
   - `MIXER_SECRET` set as a build-time variable on every hosting dashboard (Coolify, Vercel, CI);
-  - secrets removed from committed `.env` files set on the hosting before release, and rotated;
+  - secrets removed from committed `.env` files set on the hosting (current values) before release, then rotated, regenerating the Oven's Bowl API key with `PAYLOAD_SECRET`;
   - on S3 projects, `S3_STORAGE_ENDPOINT` unset or a URL (never an ARN), and the right bucket per environment;
   - `AZURE_STORAGE_CONTAINER_ACCESS` on deployments that need public blobs;
   - the `Origin` header on scripts that call the Bowl REST API with a session cookie;

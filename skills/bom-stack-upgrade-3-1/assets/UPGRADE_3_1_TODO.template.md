@@ -103,7 +103,8 @@ How to use:
 
 - [ ] Hosting and CI run Node 24.22 (≥ 22.13)
 - [ ] `MIXER_SECRET` set (non-empty, available at build time) in Coolify/Vercel/CI for every Mixer deployment
-- [ ] Secrets removed from the committed `.env` (`PAYLOAD_SECRET`, …) set on the hosting before release, and rotated (they are in git history)
+- [ ] Secrets removed from the committed `.env` (`PAYLOAD_SECRET`, …) set on the hosting with their current values before release (a missing `PAYLOAD_SECRET` gives `missing secret key` at runtime)
+- [ ] Later, rotate them (they are in git history). A new `PAYLOAD_SECRET` invalidates sessions and every API key: regenerate the Oven's Bowl API key at the same time
 - [ ] S3 projects: `S3_STORAGE_ENDPOINT` on the hosting is unset or a URL (never a bucket ARN), and `S3_STORAGE_BUCKET` is the bucket for that environment
 - [ ] `AZURE_STORAGE_CONTAINER_ACCESS` set where public media blobs are expected
 - [ ] External integrations that call the Bowl REST API with a session cookie send `Origin`
