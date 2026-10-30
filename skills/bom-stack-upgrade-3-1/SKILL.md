@@ -91,6 +91,7 @@ The upgrade is done when every checklist item is checked or skipped with a reaso
   - secrets removed from committed `.env` files set on the hosting (current values) before release, then rotated, regenerating the Oven's Bowl API key with `PAYLOAD_SECRET`;
   - on S3 projects, `S3_STORAGE_ENDPOINT` unset or a URL (never an ARN), and the right bucket per environment;
   - `AZURE_STORAGE_CONTAINER_ACCESS` on deployments that need public blobs;
+  - on projects with legacy `/oven/media` URLs, the `FS_STORAGE_*` URL variables on every Bowl deployment and the Oven redeployed with the `/bowl/api/media/file` route;
   - the `Origin` header on scripts that call the Bowl REST API with a session cookie;
   - the Node 24.22 runtime on hosting and CI;
   - a manual QA pass of the admin and frontend.

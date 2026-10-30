@@ -50,6 +50,7 @@ How to use:
 - [ ] `secret` set from `PAYLOAD_SECRET`
 - [ ] `admin.importMap`, `admin.meta.icons/openGraph` added; old `admin.bundler`/`webpack`/`css` removed
 - [ ] Storage plugin swapped to `storagePlugin(...)`
+- [ ] Public media URLs kept: if the old `cloudStorage` config had `generateFileURL` / `disablePayloadAccessControl`, they are passed per collection for s3/azure (`collections: { [slug.media]: {...} }`), see payload-config.md "Public media URLs" (or `[skip]` if it had none)
 - [ ] Committed `.env` has no secrets and no `KEY='KEY'` placeholders for variables Payload 3 now reads (`S3_STORAGE_ENDPOINT` must be empty or a URL)
 - [ ] SEO plugin swapped to `seoPlugin(...)` (function `fields`)
 - [ ] `i18n` shape updated (`fallbackLanguage`, `translations`)
@@ -67,6 +68,7 @@ How to use:
 - [ ] `src/app/(frontend)/*` (if the app serves any public page itself)
 - [ ] `next.config.ts` wrapped with `withPayload`
 - [ ] Old `src/server.ts` + Express bootstrap removed
+- [ ] Oven Ocelot `/media/{everything}` route (`src/oven/ext-settings*.json`) points to `/bowl/api/media/file/{everything}`: the Express root `/media` route is gone (or `[skip]` if the Oven has no such route)
 - [ ] `npm run generate` (importmap + types) succeeds
 - [ ] Verification: `next build` succeeds for the Bowl app
 
@@ -114,5 +116,6 @@ How to use:
 ## Notes / follow-ups for the user (manual, cannot be verified by the agent)
 
 - [ ] Confirm secrets/env vars are set in every deployment environment (`DATABASE_URL`, `PAYLOAD_SECRET`, storage credentials, etc.)
+- [ ] Projects with legacy media URLs: `FS_STORAGE_BASEURL` (e.g. `https://<site>/oven/media`), `FS_STORAGE_ENABLE_GENERATE_FILE_URL=true` and `FS_STORAGE_DISABLE_PAYLOAD_ACCESS_CONTROL` set on every Bowl deployment, and the Oven redeployed with the new `/media` route. Check that a `/oven/media/<file>` URL returns the file
 - [ ] Confirm private registry / package access for `@websolutespa/*` v3 packages in CI
 - [ ] Manual QA pass on the admin panel and the public frontend

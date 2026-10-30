@@ -63,6 +63,7 @@ Typical gaps after a 3.1 upgrade:
 | `MIXER_SECRET` | Mixer Dockerfile, compose args, runtime env, `turbo.json` (next to `IMAGE_SECRET`) |
 | `AZURE_STORAGE_CONTAINER_ACCESS` | Bowl runtime env (phase 3), `turbo.json` |
 | `S3_STORAGE_*` (S3 projects) | Bowl runtime env, with no placeholders in the committed `.env` (section 4) |
+| `FS_STORAGE_BASEURL`, `FS_STORAGE_ENABLE_GENERATE_FILE_URL`, `FS_STORAGE_DISABLE_PAYLOAD_ACCESS_CONTROL` (legacy `/oven/media` URLs, any adapter) | Bowl runtime env, `turbo.json` (payload-3-91.md section 4b) |
 | `BOM_DB`, `BOM_TEST_DB` | `turbo.json` only |
 | `NEXT_PUBLIC_*` | Build time only. Next inlines them, so a runtime value has no effect |
 

@@ -77,6 +77,10 @@ top-level scope (collections array, globals array, cors/csrf/serverURL/etc).
   bucket ARN breaks every media request with `TypeError: Invalid URL`. Leave it
   empty in the committed `.env`: on AWS the SDK derives the endpoint from
   `S3_STORAGE_REGION`.
+- **Keep the public media URLs** (see "Public media URLs" below). Payload 2
+  configs often passed `generateFileURL` (and `disablePayloadAccessControl`)
+  per collection to `cloudStorage`. Dropping them silently changes every media
+  `url` to Payload's proxy `<basePath>/api/media/file/<filename>`.
 - `seoPlugin({ collections, globals, fields: (args) => [...args.defaultFields, ...], uploadsCollection, tabbedUI })`
   — `fields` is now a function receiving `defaultFields` instead of a static
   array; migrate any custom SEO fields accordingly.
@@ -90,6 +94,85 @@ top-level scope (collections array, globals array, cors/csrf/serverURL/etc).
   entry in the `plugins` array) must guard `config.collections` being
   possibly undefined before calling array methods on it (Payload 3's plugin
   config type widens this field to optional).
+
+## Public media URLs (`generateFileURL` and the Oven `/media` route)
+
+Many bom 2.x Bowls publish media under the Oven, not the Bowl. The old config
+looked like this, and it applied to **every** adapter (S3 and Azure included),
+not only to the filesystem:
+
+```ts
+cloudStorage({
+  collections: {
+    [slug.media]: {
+      adapter: getStorageAdapter(),
+      disablePayloadAccessControl: process.env.FS_STORAGE_DISABLE_PAYLOAD_ACCESS_CONTROL == 'true' ? true : undefined,
+      generateFileURL: process.env.FS_STORAGE_ENABLE_GENERATE_FILE_URL == 'true' ? ({ filename }) => `${process.env.FS_STORAGE_BASEURL}/${filename}` : undefined,
+    },
+  },
+}),
+```
+
+with `FS_STORAGE_BASEURL=https://<site>/oven/media`. Two things break after the
+migration, and both must be fixed:
+
+**1. The URL Payload returns.** `@websolutespa/payload-plugin-storage` (3.1.x)
+reads `FS_STORAGE_BASEURL` / `FS_STORAGE_ENABLE_GENERATE_FILE_URL` /
+`FS_STORAGE_DISABLE_PAYLOAD_ACCESS_CONTROL` **only in its `fs` branch**. The
+`s3` / `azure` / `gcs` branches ignore them, so with
+`collections: [slug.media]` the url becomes `/bowl/api/media/file/<filename>`.
+Those branches do pass an **object** `collections` through to
+`@payloadcms/storage-*`, whose per-collection options accept
+`generateFileURL` and `disablePayloadAccessControl`. If the old config had
+`generateFileURL`, keep it:
+
+```ts
+// legacy public media url (e.g. https://<site>/oven/media/<filename>) instead of /api/media/file/<filename>
+// FS_STORAGE_BASEURL / FS_STORAGE_ENABLE_GENERATE_FILE_URL drive it for every adapter, as before the v3 upgrade
+const storageCollection = {
+  disablePayloadAccessControl: process.env.FS_STORAGE_DISABLE_PAYLOAD_ACCESS_CONTROL === 'true' ? true as const : undefined,
+  generateFileURL: process.env.FS_STORAGE_ENABLE_GENERATE_FILE_URL === 'true' ?
+    ({ filename }: { filename: string }) => `${process.env.FS_STORAGE_BASEURL}/${filename}` :
+    undefined,
+};
+...
+storagePlugin({
+  adapter: storageAdapter,
+  // fs reads FS_STORAGE_* itself and only accepts slugs; cloud adapters take per-collection options
+  collections: storageAdapter === 'fs' ? [slug.media] : { [slug.media]: storageCollection },
+} as StorageOptions),
+```
+
+`generateFileURL` runs in an `afterRead` hook, so existing documents get the
+old URL back without a data migration (`sizes.*.url` included). Keep the three
+`FS_STORAGE_*` variables in `turbo.json` globalEnv, and list them as a
+manual follow-up for every deployed Bowl.
+
+**2. The route that serves the file.** Payload 2 served uploads from the
+Express root at `/media/:filename`, so the Oven's Ocelot gateway
+(`src/oven/ext-settings*.json`) usually has:
+
+```json
+{ "upstreamPathTemplate": "/media/{everything}", "downstreamPathTemplate": "/media/{everything}", ... "host": "bowl" }
+```
+
+The Next.js Bowl only answers under its `basePath` (`/bowl`), so
+`http://bowl/media/<file>` now returns **404 without reaching Payload**: there
+is nothing in the Bowl log, and the Oven logs
+`Ocelot ... 404 (Not Found) status code, request uri: http://bowl/media/<file>`.
+Point the route at Payload 3's file endpoint, like the other Bowl routes in the
+same file, which already target `/bowl/api/...`:
+
+```json
+"downstreamPathTemplate": "/bowl/api/media/file/{everything}",
+```
+
+Update every `ext-settings*.json` that declares the route. Environment
+overrides such as `ext-settings.Production.json` usually don't redeclare the
+routes. The Oven must be redeployed. If the Oven can't be changed, a Bowl rewrite
+does the same job:
+`{ source: '/media/:path*', destination: '/bowl/api/media/file/:path*', basePath: false }`
+in `next.config.ts` `rewrites()`.
 
 ## Verification for this phase
 

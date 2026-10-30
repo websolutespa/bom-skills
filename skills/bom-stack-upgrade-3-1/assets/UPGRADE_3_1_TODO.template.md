@@ -63,6 +63,7 @@ How to use:
 - [ ] Scripts, tests and proxies that call REST with the session cookie send `Origin`
 - [ ] Azure: `AZURE_STORAGE_CONTAINER_ACCESS` decided per environment (or `[skip]` if Azure isn't used)
 - [ ] Custom `beforeOperation` hooks guarded for `!req.user` / non-read / auth collections (or `[skip]` if there are none)
+- [ ] Public media URLs (projects migrated from 2.x): `generateFileURL` kept for s3/azure and the Oven `/media` route points to `/bowl/api/media/file/{everything}` (payload-3-91.md section 4b, or `[skip]`)
 - [ ] Optional: `BOM_DB=memory` switch with `@websolutespa/payload-db-memory` (or `[skip]`)
 - [ ] Verification: Bowl `types` + `build` pass; admin login and a few collections work in dev
 
@@ -107,6 +108,7 @@ How to use:
 - [ ] Later, rotate them (they are in git history). A new `PAYLOAD_SECRET` invalidates sessions and every API key: regenerate the Oven's Bowl API key at the same time
 - [ ] S3 projects: `S3_STORAGE_ENDPOINT` on the hosting is unset or a URL (never a bucket ARN), and `S3_STORAGE_BUCKET` is the bucket for that environment
 - [ ] `AZURE_STORAGE_CONTAINER_ACCESS` set where public media blobs are expected
+- [ ] Legacy media URLs: `FS_STORAGE_BASEURL`, `FS_STORAGE_ENABLE_GENERATE_FILE_URL=true`, `FS_STORAGE_DISABLE_PAYLOAD_ACCESS_CONTROL` set on every Bowl deployment, Oven redeployed with the new `/media` route, and an `/oven/media/<file>` URL returns the file (or `[skip]`)
 - [ ] External integrations that call the Bowl REST API with a session cookie send `Origin`
 - [ ] Editors told: uploads are capped at 50 MB, SVGs are validated, API keys can't be read back
 - [ ] Manual QA: admin (custom views, uploads, localization, cron jobs, seed), frontend (images, forms, emails, live preview)

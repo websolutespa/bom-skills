@@ -60,6 +60,26 @@ You don't need to edit anything for these, but you need to know them when you te
   - The plugin also keeps the app's `config.custom` and creates redirects when a slug changes.
 - **payload-plugin-bowl-llm** (llm projects): the MCP endpoint (`POST /bowl/api/llm/mcp?appKey=…&apiKey=…&locale=…`) now runs on mcp-handler 2. It never worked on 3.0.x. Route, auth and tool names are unchanged.
 
+## 4b. Check: public media URLs on projects migrated from 2.x
+
+Projects that came from bom 2.x through an older run of `bom-stack-upgrade`
+may have lost their public media URLs. The symptom is that media urls are
+`/bowl/api/media/file/<filename>` instead of `https://<site>/oven/media/<filename>`.
+Once the URL is fixed, the Oven returns 404 on `/oven/media/...` without
+reaching the Bowl. Check both:
+
+1. `git log -S generateFileURL -- src/bowl`: if the 2.x config passed
+   `generateFileURL` to `cloudStorage` and the current `storagePlugin` call
+   uses `collections: [slug.media]` with an `s3`/`azure` adapter, the URL was
+   lost. `payload-plugin-storage` 3.1 reads `FS_STORAGE_*` only for `fs`.
+2. `grep -n '"/media/{everything}"' src/oven/ext-settings*.json`: a
+   `downstreamPathTemplate` of `/media/{everything}` targets the Payload 2
+   Express route, which no longer exists.
+
+The fix for both is in the `bom-stack-upgrade` skill,
+references/payload-config.md, section "Public media URLs". Skip this section
+when neither check matches, and record `[skip]`.
+
 ## 5. Optional: in-memory database switch (`BOM_DB=memory`)
 
 The samples can now start the Bowl app without MongoDB. The e2e tests use this, and it also works for quick local runs. To adopt it, add `@websolutespa/payload-db-memory` `^3.1.0` to the Bowl app's dependencies (dependencies.md), then:

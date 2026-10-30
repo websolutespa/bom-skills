@@ -7,7 +7,7 @@ argument-hint: 'Path to the monorepo root (defaults to workspace root)'
 # BOM Stack 2.x → 3.x Upgrade
 
 Upgrades a Websolute "BOM stack" monorepo — **Bowl** (Payload CMS headless
-admin), **Oven** (.NET middleware, not touched by this skill), **Mixer**
+admin), **Oven** (.NET middleware, not touched by this skill except for its Ocelot `/media` route, see payload-config.md "Public media URLs"), **Mixer**
 (Next.js frontend) — from Payload 2.x/Next 14 to Payload 3.x/Next 15/React 19,
 along with all `@websolutespa/*` proprietary package upgrades and the
 associated refactors and TypeScript fixes.
