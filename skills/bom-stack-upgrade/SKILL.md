@@ -80,10 +80,39 @@ in full before editing files for that phase.
 | 6 | Mixer lazy block split | [references/lazy-blocks.md](./references/lazy-blocks.md) | Mixer UI package `lazy/` blocks using `withLazyProps`, plus every page template's `getPageProps` import |
 | 7 | Middleware → proxy | [references/proxy-middleware.md](./references/proxy-middleware.md) | Mixer web `middleware.ts` |
 | 8 | TypeScript fixes | [references/typescript-fixes.md](./references/typescript-fixes.md) | repo-wide compile error cleanup, applied last |
+| 9 | **Data sanitization (blocking)** | the `bom-db-sanitize` skill | the Bowl app's MongoDB data on every environment |
 
 Phases 3–7 only apply to the apps that actually contain that pattern (e.g. a
 project without lazy blocks skips phase 6) — record in the checklist which
-phases were skipped and why.
+phases were skipped and why. Phase 9 is never skipped on a MongoDB project.
+
+## 2.2 Phase 9: data sanitization (blocking)
+
+This upgrade moves the **code** to Payload 3, not the **data**. Payload 2
+stored relationship / upload ids and versions' `parent` as strings; Payload 3
+writes ObjectIds and never converts the old values. Left as is, every query
+on those ids misses the old documents, and the first save of each document
+on Payload 3 leaves two `latest` versions: the document shows up **twice** in
+the admin list of draft-enabled collections. This happened on a real project
+upgraded with this skill (14,621 string ids, 10 duplicated documents).
+
+Run the `bom-db-sanitize` skill as phase 9, as soon as the Bowl app builds
+(after phase 4 the Payload 3 config loads), and **before any editor saves
+content on Payload 3**. If the skill is not installed:
+`npx skills add websolutespa/bom-skills --skill bom-db-sanitize`.
+
+1. Install its tool into the Bowl app and wire `withLatestVersionFix` in
+   `payload.config.ts` (see payload-config.md, `db` row).
+2. Dev database: `db:check` → `db:fix` dry run → show it to the user →
+   `db:fix:apply --expect-db=<db>` only with their go-ahead → `db:check`
+   must print "Database is clean.".
+3. Staging and production: the **user** runs the same commands (runbook in
+   the `bom-db-sanitize` skill) when the new Bowl is deployed there, before
+   editors use it. Record each environment in `bom-upgrade/DB_SANITIZE.md`.
+
+If the database can't be reached from the agent's environment, ask the user
+to run `db:check` and paste the summary. Never mark phase 9 done without a
+clean `db:check` for dev.
 
 ## 2.1 Cross-cutting directive rules
 
@@ -120,7 +149,10 @@ them; fix and re-run before checking the phase off.
 ## 4. Completion
 
 The task is done when every item in `UPGRADE_TODO.md` is checked and phase 3
-(verification) passes for every app that was touched. Summarize for the user:
+(verification) passes for every app that was touched, and phase 9 has a clean
+`db:check` on dev. Summarize for the user:
 what changed, what was skipped and why, and any manual follow-up needed
 (secrets/env vars, infra, private registry credentials) that the agent cannot
-verify itself.
+verify itself. List the environments whose database sanitization is still
+pending: **the new Bowl must not go live on an environment before its
+`db:check` is clean.**

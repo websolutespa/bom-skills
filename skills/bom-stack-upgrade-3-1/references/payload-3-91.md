@@ -97,6 +97,8 @@ The samples can now start the Bowl app without MongoDB. The e2e tests use this, 
 
 Data lives in process memory and is lost on restart. Never set `BOM_DB` in a deployed environment. Skip this section if the user doesn't want it, and record `[skip]`.
 
+If the project wraps the adapter with `withLatestVersionFix` (installed by the `bom-db-sanitize` skill, see guardrails step D2), keep the wrapper on the MongoDB branch only: `process.env.BOM_DB === 'memory' ? memoryAdapter() : withLatestVersionFix(mongooseAdapter({ ... }))`.
+
 ## Verification
 
 ```bash

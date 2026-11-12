@@ -19,6 +19,7 @@ How to use:
 - [ ] `npm view @websolutespa/bom-next dist-tags` → next is 4.0.0-next.8 or later
 - [ ] `npm view @websolutespa/oxc dist-tags` → next is 4.0.0-next.8 or later
 - [ ] Working tree clean (or the user decided)
+- [ ] Data pre-check (guardrails step D2): `db:check` (bom-db-sanitize) on dev database `<db name>` → "Database is clean." (or `[skip] not MongoDB`; or the user's explicit decision and reason)
 
 ## Path B: monorepo → bom-sample architecture (references/monorepo-to-app-router.md)
 
@@ -33,6 +34,7 @@ How to use:
 - [ ] B7 actions, emails, auth
 - [ ] B8 env files and deployment (Dockerfile, hosting variables)
 - [ ] B9 old apps removed (`src/bowl`, `src/mixer`, turbo, workspaces); continue with path A
+- [ ] B10 after the data migration (renamed / dropped collections): `bom-db-sanitize` tool and `withLatestVersionFix` carried over to the new app, `pnpm db:check` clean on the migrated dev database
 
 ## Path A1: runtime and pnpm 11 (references/toolchain.md §1)
 
@@ -89,6 +91,7 @@ How to use:
 
 - [ ] clean `corepack pnpm install --frozen-lockfile`
 - [ ] `pnpm run types`, `pnpm run lint` (0 errors), `pnpm run format:check`, `pnpm run test:integration`, `pnpm run build`, `pnpm run test:e2e` (mock store)
+- [ ] `withLatestVersionFix` (bom-db-sanitize) wired on the MongoDB adapter, and `pnpm db:check` exits 0 on the dev database (or `[skip] not MongoDB`)
 
 ## Manual follow-ups (for the user)
 

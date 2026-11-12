@@ -30,7 +30,7 @@ next.
    what makes the task resumable across sessions if interrupted.
 3. **Phase order.** Work through the phases in the table in `SKILL.md`
    (dependencies → tooling → payload config → app router → custom components
-   → lazy blocks → proxy/middleware → TypeScript fixes), verifying after each
+   → lazy blocks → proxy/middleware → TypeScript fixes → data sanitization), verifying after each
    one before moving to the next. Skip phases that don't apply to this repo
    and record why in the checklist rather than silently ignoring them. The
    lazy blocks phase also includes sweeping every Mixer `pages/**/*.tsx`
@@ -46,6 +46,12 @@ next.
 6. **Ask, don't guess.** If the guardrail check is ambiguous, or a phase
    doesn't clearly apply/not-apply to this repo's actual structure, ask a
    short clarifying question instead of assuming.
+7. **Data sanitization is blocking (phase 9).** The upgrade converts the code,
+   not the data. Run the `bom-db-sanitize` skill as soon as the Bowl builds:
+   `db:check` must print "Database is clean." on the dev database before the
+   upgrade is done. Never run `db:fix:apply` without the user's go-ahead for
+   that database name. Staging and production are sanitized by the user,
+   before go-live.
 
 ## When to stop and report
 
@@ -54,7 +60,9 @@ next.
 - All checklist items are checked and the final verification gate in
   `UPGRADE_TODO.md` passes → summarize what changed, what was skipped and
   why, and any manual follow-ups the user needs to handle (secrets, infra,
-  registry access) that you could not verify yourself.
+  registry access) that you could not verify yourself. List the environments
+  whose database sanitization is still pending: none of them may go live
+  before its `db:check` is clean.
 - Otherwise, if you run out of turns/context mid-task, make sure the
   checklist accurately reflects what's done so the next run can resume
   cleanly — this is the whole point of the checklist.

@@ -41,10 +41,25 @@ Also confirm that 3.1 is actually published: `npm view @websolutespa/bom-core ve
 ## Step D: decide
 
 - **Resuming.** `bom-upgrade/UPGRADE_3_1_TODO.md` exists → continue from the first unchecked item, whatever step C found.
-- **Bom-stack 2.x.** `payload` major is below 3, or any `@websolutespa/*` major is below 3 → **stop**. Tell the user to run the `bom-stack-upgrade` skill (2.x → 3.x) first.
+- **Bom-stack 2.x.** `payload` major is below 3, or any `@websolutespa/*` major is below 3 → **stop**. Tell the user to run the `bom-stack-upgrade` skill (2.x → 3.x) first, including its phase 9 (data sanitization).
 - **Already on 3.1.** Every `@websolutespa/*` is at `^3.1.0` or later, and `payload` is at `>= 3.91.0` → **stop** and say so. Change nothing. To move on to 4.x (the bom-sample App Router stack), suggest the `bom-stack-upgrade-4-0` skill.
 - **Eligible.** `payload` is at `3.x < 3.91` and the `@websolutespa/*` ranges are `^3.0.x` → create the checklist and start phase 1.
 - **Mixed or ambiguous.** For example, `@websolutespa/*` is already on 3.1 but `payload` is still 3.74, which is a half-done manual upgrade. Show the user what you found and ask one question. Usually the answer is to continue from phase 1, which is idempotent.
+
+## Step D2: data pre-check (blocking, eligible projects)
+
+Run it before creating the checklist. A resumed upgrade did it at the start: the checklist's guardrail item records it.
+
+Bom-stack 3.0.x projects usually come from 2.x, and `bom-stack-upgrade` before its phase 9 didn't convert the data: relationship ids and versions' `parent` are still Payload 2 strings, and draft listings show duplicated documents. Upgrading on top of that data hides the problem further. Check it first:
+
+1. If `bom-upgrade/DB_SANITIZE.md` exists and records a clean `db:check` for dev, still run step 2 (it is read-only and fast) to confirm nothing changed.
+2. Install the `bom-db-sanitize` tool if the Bowl app has no `db:check` script (`npx skills add websolutespa/bom-skills --skill bom-db-sanitize`, then its `scripts/install.mjs`), and run `npm run db:check` in the Bowl app. It is read-only. Tell the user which database it connected to.
+3. Decide:
+   - **exit 0, "Database is clean."** → eligible, continue.
+   - **exit 1** → **stop**. Show the summary, and tell the user to run the `bom-db-sanitize` skill (dev now, staging and production by them), then run this skill again. Don't start phase 1 on unsanitized data.
+   - **exit 2, or no database reachable** from the agent's environment → ask the user to run `db:check` against the dev database and paste the summary. Never skip the check silently. If the user explicitly decides to proceed without it, record that decision and the reason in the checklist's guardrail item.
+
+The project is not on MongoDB (`@payloadcms/db-mongodb` not a dependency)? Record `[skip] not MongoDB` and continue.
 
 ## Step E: never be destructive
 

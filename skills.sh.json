@@ -8,7 +8,8 @@
       "skills": [
         "bom-stack-upgrade",
         "bom-stack-upgrade-3-1",
-        "bom-stack-upgrade-4-0"
+        "bom-stack-upgrade-4-0",
+        "bom-db-sanitize"
       ]
     },
     {

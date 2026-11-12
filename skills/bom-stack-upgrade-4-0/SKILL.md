@@ -47,6 +47,8 @@ powershell -ExecutionPolicy Bypass -File .agents/skills/bom-stack-upgrade-4-0/sc
 
 Run [references/guardrails.md](./references/guardrails.md) before touching any file. It decides the path above, checks that `4.0.0-next.8` (and `@websolutespa/oxc`) is published, and stops on a dirty working tree until the user decides.
 
+It also runs a **data pre-check** (step D2): `db:check` from the `bom-db-sanitize` skill must be clean on the dev database. Projects that came from bom-stack 2.x often still hold Payload 2 string ids, which break queries and show documents twice in draft listings; the upgrade stops until `bom-db-sanitize` has fixed them.
+
 ## 1. Create or resume the todo checklist
 
 - The checklist lives at `<repo-root>/bom-upgrade/UPGRADE_4_0_TODO.md`.

@@ -20,6 +20,7 @@ How to use:
 - [ ] Mixer packages: `<path>/packages/*/package.json` (list them)
 - [ ] Bowl packages / other packages: `<path>` (list them)
 - [ ] `npm view @websolutespa/bom-core version` prints 3.1.x or later
+- [ ] Data pre-check (guardrails step D2): `db:check` (bom-db-sanitize) on dev database `<db name>` → "Database is clean." (or `[skip] not MongoDB`; or the user's explicit decision and reason)
 
 ## Phase 1: dependencies (references/dependencies.md)
 
@@ -99,6 +100,7 @@ How to use:
 - [ ] `npx turbo run test`: passes
 - [ ] Bowl app and Mixer web `build` succeed
 - [ ] e2e suites pass (if adopted)
+- [ ] `withLatestVersionFix` (bom-db-sanitize) still wired in `payload.config.ts`, and `db:check` still exits 0 on the dev database
 
 ## Manual follow-ups for the user (the agent can't verify these)
 

@@ -16,7 +16,8 @@ Read the whole `SKILL.md` first. Then read the reference file for the phase you 
    - the repo is not a BOM-stack project;
    - it is still on bom-stack 2.x (in that case, point the user to the `bom-stack-upgrade` skill);
    - it is already on 3.1 (`@websolutespa/*` `^3.1`, `payload >= 3.91.0`);
-   - 3.1 is not published yet.
+   - 3.1 is not published yet;
+   - **the data is not sanitized**: `db:check` from the `bom-db-sanitize` skill exits 1 on the dev database (guardrails step D2). Point the user to `bom-db-sanitize`. If the database can't be reached, ask the user to run `db:check`; never skip the check silently.
 2. **Resumable checklist.** Create or resume `bom-upgrade/UPGRADE_3_1_TODO.md` from [assets/UPGRADE_3_1_TODO.template.md](../../.claude/skills/bom-stack-upgrade-3-1/assets/UPGRADE_3_1_TODO.template.md). Read it before starting, and keep it updated as you go.
 3. **Phase order.** Work through the phases in order: dependencies → tooling → deployment env vars (Dockerfiles, compose) → Payload 3.91 → Next 16.4 → code fixes → tests. Verify after each one. Skip what doesn't apply, and record `[skip] reason` in the checklist.
 4. **Exact versions.** Use the versions in `references/dependencies.md`. Never upgrade a package listed in `references/held-back.md`; in particular, **styled-components stays on 5.3.11**.

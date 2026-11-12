@@ -58,7 +58,10 @@ investigation" and lean cautious).
   re-verify a partially-completed upgrade, that's a different task — point
   them at the checklist file instead, see below.) If the project is on
   3.0.x, the `bom-stack-upgrade-3-1` skill upgrades it to the 3.1 release
-  (Payload 3.91, Next 16.4); suggest that instead.
+  (Payload 3.91, Next 16.4); suggest that instead. If the project was
+  migrated from 2.x and `bom-upgrade/DB_SANITIZE.md` doesn't exist, its data
+  was probably never converted: suggest the `bom-db-sanitize` skill first
+  (the 3.1 and 4.0 skills require a clean `db:check` anyway).
 - **Partially upgraded / resuming**: if `bom-upgrade/UPGRADE_TODO.md` already
   exists in the repo, this is a resume, not a fresh guardrail decision — skip
   straight to reading the checklist and continuing from the first unchecked

@@ -16,7 +16,8 @@ Read the whole `SKILL.md` first. Then read the reference file for the phase you 
    - the repo is not a BOM-stack project;
    - it is on bom-stack 2.x or 3.0.x (point the user to `bom-stack-upgrade` / `bom-stack-upgrade-3-1` first);
    - it is already on the bom-sample 4.0.0-next.8 stack;
-   - `@websolutespa/bom-next` 4.0.0-next.8 or `@websolutespa/oxc` is not published yet.
+   - `@websolutespa/bom-next` 4.0.0-next.8 or `@websolutespa/oxc` is not published yet;
+   - **the data is not sanitized**: `db:check` from the `bom-db-sanitize` skill exits 1 on the dev database (guardrails step D2). Point the user to `bom-db-sanitize`. If the database can't be reached, ask the user to run `db:check`; never skip the check silently.
 2. **Path B needs a plan.** For a 3.1 monorepo, present the plan in `references/monorepo-to-app-router.md` (phase B0) and wait for the user's explicit go-ahead: it rebuilds the site on bom-next with Tailwind/shadcn.
 3. **Resumable checklist.** Create or resume `bom-upgrade/UPGRADE_4_0_TODO.md` from [assets/UPGRADE_4_0_TODO.template.md](../../.claude/skills/bom-stack-upgrade-4-0/assets/UPGRADE_4_0_TODO.template.md). Read it before starting and keep it updated.
 4. **Phase order.** Path A: A1 runtime/pnpm 11 → A2 dependencies → A3 TypeScript 6 → A4 tests → A5 oxlint → A6 oxfmt → A7 code fixes. Verify after each one; skip what doesn't apply with `[skip] reason`.

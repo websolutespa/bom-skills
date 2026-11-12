@@ -39,12 +39,13 @@ powershell -ExecutionPolicy Bypass -File .agents/skills/bom-stack-upgrade-3-1/sc
 
 ## 0. Guardrails: run first, every time
 
-Run the checks in [references/guardrails.md](./references/guardrails.md) before touching any file. They have four possible outcomes:
+Run the checks in [references/guardrails.md](./references/guardrails.md) before touching any file. They have five possible outcomes:
 
 1. **Not a BOM-stack project.** Stop and explain why.
 2. **Still on bom-stack 2.x** (Payload or `@websolutespa/*` major below 3). Stop, and tell the user to run the `bom-stack-upgrade` skill (2.x → 3.x) first.
 3. **Already on 3.1** (every `@websolutespa/*` at `^3.1` or later and `payload` at `>=3.91.0`). Stop and say so.
-4. **Eligible** (3.0.x). Continue. If the checklist already exists, resume it.
+4. **Data not sanitized** (step D2: `db:check` of the `bom-db-sanitize` skill exits 1 on the dev database). Stop, and tell the user to run `bom-db-sanitize` first. Payload 2 string ids left in the data break queries and duplicate documents in draft listings.
+5. **Eligible** (3.0.x, `db:check` clean). Continue. If the checklist already exists, resume it.
 
 ## 1. Create or resume the todo checklist
 

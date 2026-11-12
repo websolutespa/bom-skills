@@ -47,7 +47,7 @@ top-level scope (collections array, globals array, cors/csrf/serverURL/etc).
 
 | Option | Before | After |
 |---|---|---|
-| `db` | `mongooseAdapter({ url: mongoDbUri, transactionOptions: false })` reading `process.env.MONGODB_URI` | same adapter/shape, but reads `process.env.DATABASE_URL` (rename the env var everywhere: `.env`, docker-compose, deployment config) |
+| `db` | `mongooseAdapter({ url: mongoDbUri, transactionOptions: false })` reading `process.env.MONGODB_URI` | same adapter/shape, but reads `process.env.DATABASE_URL` (rename the env var everywhere: `.env`, docker-compose, deployment config), wrapped with the runtime fix installed by the `bom-db-sanitize` skill (phase 9): `db: withLatestVersionFix(mongooseAdapter({ url: process.env.DATABASE_URL \|\| '', transactionOptions: false }))`. Keep `transactionOptions: false`; why, and what turning it on would change: `bom-db-sanitize` references/transactions.md. The existing **data** still needs phase 9: Payload 3 doesn't convert Payload 2's string ids |
 | `secret` | not required explicitly in some 2.x setups | **required**: `secret: process.env.PAYLOAD_SECRET \|\| ''` |
 | `admin.bundler` / `admin.webpack` | `webpackBundler()` + custom `webpack(config)` fallback shims | removed — bundling is Next.js's job now |
 | `admin.css` (`path.resolve(__dirname, './styles.scss')`) | replaced by importing `'./custom.scss'` from the generated `(payload)/layout.tsx` (see app-router.md) |

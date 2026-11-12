@@ -105,6 +105,16 @@ How to use:
 - [ ] `npx eslint . --fix` run for quote-style/import-order cleanup
 - [ ] Optional array spreads guarded (`...(x || [])`)
 
+## Phase 9 — Data sanitization, blocking (`bom-db-sanitize` skill)
+
+<!-- Payload 3 doesn't convert Payload 2 data: string ids break queries and duplicate documents in draft listings. Never [skip] on MongoDB. -->
+- [ ] `bom-db-sanitize` skill installed (`npx skills add websolutespa/bom-skills --skill bom-db-sanitize`)
+- [ ] Tool installed in the Bowl app (`scripts/db/`, `db:*` scripts) and `db-fix-backup-*.json` in the root `.gitignore`, files committed
+- [ ] `withLatestVersionFix` wired in `payload.config.ts`; Bowl `types` + `build` pass
+- [ ] Dev database `<db name>`: `db:check` before (paste the summary), `db:fix` dry run shown to the user
+- [ ] Dev database: `db:fix:apply --expect-db=<db>` run with the user's go-ahead; `db:check` → "Database is clean."
+- [ ] `bom-upgrade/DB_SANITIZE.md` created; staging / production listed as pending for the user
+
 ## Final verification gate (must all pass before declaring done)
 
 - [ ] `npm install`
@@ -112,9 +122,11 @@ How to use:
 - [ ] `npm run lint` — zero errors, every touched app
 - [ ] `npm run build` — every touched app builds
 - [ ] `npm run test:integration` (if present) — passes
+- [ ] `db:check` exits 0 on the dev database (phase 9)
 
 ## Notes / follow-ups for the user (manual, cannot be verified by the agent)
 
+- [ ] **Before go-live on each environment** (staging, production): the new Bowl deployed, then `db:check` → `db:fix` dry run → `db:fix:apply --expect-db=<db>` → `db:check` clean, run by the user (runbook in `bom-db-sanitize`), recorded in `bom-upgrade/DB_SANITIZE.md`
 - [ ] Confirm secrets/env vars are set in every deployment environment (`DATABASE_URL`, `PAYLOAD_SECRET`, storage credentials, etc.)
 - [ ] Projects with legacy media URLs: `FS_STORAGE_BASEURL` (e.g. `https://<site>/oven/media`), `FS_STORAGE_ENABLE_GENERATE_FILE_URL=true` and `FS_STORAGE_DISABLE_PAYLOAD_ACCESS_CONTROL` set on every Bowl deployment, and the Oven redeployed with the new `/media` route. Check that a `/oven/media/<file>` URL returns the file
 - [ ] Confirm private registry / package access for `@websolutespa/*` v3 packages in CI
